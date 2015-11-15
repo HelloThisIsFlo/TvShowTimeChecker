@@ -1,5 +1,5 @@
 import httplib2
-from credentials_secret import client_id_showtime, client_secret_showtime, user_agent_showtime
+from credentials_secret import client_id_showtime, client_secret_showtime, user_agent_showtime, temp_token_showtime
 import string
 import random
 from urllib import urlencode
@@ -14,19 +14,38 @@ def random_string_generator(size=6, chars=string.ascii_uppercase + string.digits
 
 
 class TvShowTime:
-    def __init__(self):
-        pass
+    """ This class is a utility class to connect to the TvShowTime API
+
+    Simply enter your auth infos and use the method : 'make_tvshowtime_request'
+    """
+
+    def __init__(self, client_id=None, client_secret=None, user_agent=None, token=None):
+        self.client_id = client_id
+        self.client_secret = client_secret
+        self.user_agent = user_agent
+        self.token = token
+
+        self.base_url = "https://api.tvshowtime.com/v1"
+        self.device_code = ''
+
+        if not token and client_id and client_secret and user_agent:
+            # Start the authentication process
+            self.__make_step_1()
+            self.__make_step_2()
+        elif not token:
+            raise Exception("Please init token OR client_id, client_secret and user_agent")
+        # if token present : do nothing
 
     def __make_tvst_post(self, url, data):
         f = urllib2.Request(url)
-        f.add_header('User-Agent', user_agent_showtime)
+        f.add_header('User-Agent', self.user_agent)
 
         res = urllib2.urlopen(f, data)  # Specifying the data argument transform makes a POST request instead of GET
         return json.load(res)
 
-    def make_step_1(self):
+    def __make_step_1(self):
         step_1_url = "https://api.tvshowtime.com/v1/oauth/device/code?"
-        step_1_parameters = urlencode({"client_id": client_id_showtime})
+        step_1_parameters = urlencode({"client_id": self.client_id})
 
         step_1_dict = self.__make_tvst_post(step_1_url, step_1_parameters)
 
@@ -47,14 +66,14 @@ class TvShowTime:
         # ok_dialog.make_ok_dialog("Click 'Ok' when authenticated on TvShowTime")
         raw_input("Press Enter to continue...")
 
-        return device_code
+        self.device_code = device_code
 
-    def make_step_2(self, device_code):
+    def __make_step_2(self):
         step_2_url = "https://api.tvshowtime.com/v1/oauth/access_token"
         step_2_parameters = urlencode({
-            "client_id": client_id_showtime,
-            "client_secret": client_secret_showtime,
-            "code": device_code
+            "client_id": self.client_id,
+            "client_secret": self.client_secret,
+            "code": self.device_code
         })
         step_2_dict = self.__make_tvst_post(step_2_url, step_2_parameters)
         token = step_2_dict.get('access_token', '')
@@ -62,14 +81,41 @@ class TvShowTime:
         if token is '':
             raise Exception('No TOKEN . . . error somewhere! ^_^')
 
-        return token
+        self.token = token
+        print "Token = " + token
+        print
+
+    def make_tvshowtime_request(self, method, parameters):
+        # Add token & encode parameters
+        parameters['access_token'] = self.token
+        encoded_parameters = urlencode(parameters)
+
+        # Make the url
+        url = self.base_url + "/" + method + "?" + encoded_parameters
+        res = urllib2.urlopen(url)
+        return json.load(res)
 
 
 def main():
-    tvst = TvShowTime()
-    device_code = tvst.make_step_1()
-    token = tvst.make_step_2(device_code)
+    # tvst = TvShowTime(
+    #     client_id=client_id_showtime,
+    #     client_secret=client_secret_showtime,
+    #     user_agent=user_agent_showtime
+    # )
+    tvst = TvShowTime(token=temp_token_showtime)
 
+    # Now we have finally the toke :D :D So we can work :D
+    # /!\ The maximum number of request per minute is 10!!! So keep it to a minimum when debugging ;)
+
+    # Get the library of tv shows, just to try that the API works
+    parameters = {
+        'limit': '100'
+    }
+    res = tvst.make_tvshowtime_request("library", {})
+    print "You are watching the following shows : "
+    for show in res.get('shows', []):
+        name = show.get('name', '')
+        print(name)
 
 
 main()
