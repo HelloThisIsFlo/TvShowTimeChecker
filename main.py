@@ -1,6 +1,6 @@
 import guessit
 import fileparser
-
+import dialog
 
 def get_value(key, dictionary):
     if key in dictionary:
@@ -21,3 +21,6 @@ for root, dirs, files in parser.walk_torrent():
         print "Season : " + get_value('season', guess)
         print "Episode : " + get_value('season', guess)
         print
+
+dialog_box = dialog.Dialog("Search book : ")
+dialog_box.show()
