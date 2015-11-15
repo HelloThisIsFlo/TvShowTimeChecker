@@ -5,6 +5,9 @@ class Dialog:
     def __init__(self, hint="Input : "):
         self.top = Tk()
 
+        # Init the result variable
+        self.result = ""
+
         # Create the views
         self.E1 = Entry(self.top)
         self.L1 = Label(self.top, text=hint)
@@ -15,9 +18,9 @@ class Dialog:
         self.L1.grid(row=0, column=0)
         self.B1.grid(row=1, column=0)
 
-    def print_entry(self):
-        print "Search text = {text}".format(text=self.E1.get())
-        self.top.quit()
-
-    def show(self):
+        # Start the dialog
         self.top.mainloop()
+
+    def print_entry(self):
+        self.result = self.E1.get()
+        self.top.quit()

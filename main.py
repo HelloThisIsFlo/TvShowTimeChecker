@@ -23,4 +23,3 @@ for root, dirs, files in parser.walk_torrent():
         print
 
 dialog_box = dialog.Dialog("Search book : ")
-dialog_box.show()
