@@ -1,26 +1,51 @@
 from Tkinter import Tk, Label, Entry, Button
 
 
-class Dialog:
-    def __init__(self, hint="Input : "):
+# Decorator to create a new instance of TK every time
+def init_decorator(func):
+    def inner_func(self, hint):
+        # Create new Tk
         self.top = Tk()
-
-        # Init the result variable
-        self.result = ""
-
-        # Create the views
-        self.E1 = Entry(self.top)
-        self.L1 = Label(self.top, text=hint)
-        self.B1 = Button(self.top, command=self.print_entry, text="Ok")
-
-        # Setup the views
-        self.E1.grid(row=0, column=1)
-        self.L1.grid(row=0, column=0)
-        self.B1.grid(row=1, column=0)
-
-        # Start the dialog
+        # Create the desired UI element
+        func(self, hint)
+        # Start main loop
         self.top.mainloop()
 
-    def print_entry(self):
-        self.result = self.E1.get()
-        self.top.quit()
+    return inner_func
+
+
+class Dialog:
+    def __init__(self):
+        # Init the member variable variable
+        self.top = None
+        self.result = ""
+
+    @init_decorator
+    def make_input_dialog(self, hint):
+        # Create the views
+        entry = Entry(self.top)
+        label = Label(self.top, text=hint)
+
+        def print_entry():
+            self.result = entry.get()
+            self.top.quit()
+
+        button = Button(self.top, command=print_entry, text="Ok")
+
+        # Setup the views
+        entry.grid(row=0, column=1)
+        label.grid(row=0, column=0)
+        button.grid(row=1, column=0)
+
+    @init_decorator
+    def make_ok_dialog(self, hint):
+        # Create the views
+        label = Label(self.top, text=hint)
+        button = Button(self.top, command=self.top.quit, text="Ok")
+
+        # Setup the views
+        label.pack()
+        button.pack()
+
+
+
