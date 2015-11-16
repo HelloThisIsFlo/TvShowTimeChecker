@@ -7,6 +7,7 @@ from pprint import pprint
 import urllib2
 import json
 import dialog
+from xml.etree import ElementTree
 
 
 def random_string_generator(size=6, chars=string.ascii_uppercase + string.digits):
@@ -19,13 +20,15 @@ class TvShowTime:
     Simply enter your auth infos and use the method : 'make_tvshowtime_request'
     """
 
+    base_url = "https://api.tvshowtime.com/v1"
+    base_url_tvdb = "http://thetvdb.com/api/GetSeries.php/api/GetSeries.php"
+
     def __init__(self, client_id=None, client_secret=None, user_agent=None, token=None):
         self.client_id = client_id
         self.client_secret = client_secret
         self.user_agent = user_agent
         self.token = token
 
-        self.base_url = "https://api.tvshowtime.com/v1"
         self.device_code = ''
 
         if not token and client_id and client_secret and user_agent:
@@ -95,27 +98,22 @@ class TvShowTime:
         res = urllib2.urlopen(url)
         return json.load(res)
 
+    def _get_tvdb_serie_id(self, tv_show_name):
+        # Create and encode parameters
+        parameters = {
+            'seriesname': tv_show_name
+        }
+        encoded_parameters = urlencode(parameters)
 
-def main():
-    # tvst = TvShowTime(
-    #     client_id=client_id_showtime,
-    #     client_secret=client_secret_showtime,
-    #     user_agent=user_agent_showtime
-    # )
-    tvst = TvShowTime(token=temp_token_showtime)
+        # Make the url
+        url = self.base_url_tvdb + "?" + encoded_parameters
 
-    # Now we have finally the toke :D :D So we can work :D
-    # /!\ The maximum number of request per minute is 10!!! So keep it to a minimum when debugging ;)
+        # Make request
+        response = urllib2.urlopen(url)
 
-    # Get the library of tv shows, just to try that the API works
-    parameters = {
-        'limit': '100'
-    }
-    res = tvst.make_tvshowtime_request("library", {})
-    print "You are watching the following shows : "
-    for show in res.get('shows', []):
-        name = show.get('name', '')
-        print(name)
+        # Parse response
+        response_tree = ElementTree.parse(response).getroot()
+        return response_tree.find('Series/seriesid').text  #serie_id
 
-
-main()
+    def test(self, test_arg):
+        return self._get_tvdb_serie_id(test_arg)
