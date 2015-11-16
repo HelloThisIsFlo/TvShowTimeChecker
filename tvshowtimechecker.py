@@ -4,12 +4,7 @@ from pprint import pprint
 
 
 # Main script for the application
-tvst = tvshowtime.TvShowTime(
-    client_id=credentials_secret.client_id,
-    client_secret=credentials_secret.client_secret,
-    user_agent=credentials_secret.user_agent_showtime,
-    token=credentials_secret.temp_token_showtime
-)
+tvst = tvshowtime.TvShowTime()
 
 parameters = {
     'show_id': '153021'

@@ -1,17 +1,23 @@
-import httplib2
-from credentials_secret import client_id_showtime, client_secret_showtime, user_agent_showtime, temp_token_showtime
-import string
-import random
-from urllib import urlencode
-from pprint import pprint
-import urllib2
 import json
-import dialog
+import random
+import string
+import urllib2
+from urllib import urlencode
 from xml.etree import ElementTree
 
 
 def random_string_generator(size=6, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
+
+
+def check_token_decorator(func):
+    def inner(self):
+        if not self.token:
+            self.__prompt_authenticate()
+        else:
+            inner(self)
+
+    return inner
 
 
 class TvShowTime:
@@ -23,21 +29,33 @@ class TvShowTime:
     base_url = "https://api.tvshowtime.com/v1"
     base_url_tvdb = "http://thetvdb.com/api/GetSeries.php/api/GetSeries.php"
 
-    def __init__(self, client_id=None, client_secret=None, user_agent=None, token=None):
-        self.client_id = client_id
-        self.client_secret = client_secret
-        self.user_agent = user_agent
+    def __init__(self, token=None):
+        self.client_id = None
+        self.client_secret = None
+        self.user_agent = None
         self.token = token
 
         self.device_code = ''
 
-        if not token and client_id and client_secret and user_agent:
-            # Start the authentication process
-            self.__make_step_1()
-            self.__make_step_2()
-        elif not token:
-            raise Exception("Please init token OR client_id, client_secret and user_agent")
-        # if token present : do nothing
+        if not token:
+            self.__prompt_authenticate()
+
+    @staticmethod
+    def __prompt_authenticate():
+        print("Please authenticate . . . . ")
+        print("Call the method authenticate with 'client_id', 'client_secret' and 'user_agent'")
+        print("The token will automatically be saved, no need to create a new instance!")
+        print
+
+    def generate_token(self, client_id, client_secret, user_agent):
+        # Save the keys
+        self.client_id = client_id
+        self.client_secret = client_secret
+        self.user_agent = user_agent
+
+        # Make authentication
+        self.__make_step_1()
+        self.__make_step_2()
 
     def __make_tvst_post(self, url, data):
         f = urllib2.Request(url)
@@ -88,6 +106,7 @@ class TvShowTime:
         print "Token = " + token
         print
 
+    @check_token_decorator
     def make_tvshowtime_request(self, method, parameters):
         # Add token & encode parameters
         parameters['access_token'] = self.token
