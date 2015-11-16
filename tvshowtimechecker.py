@@ -4,14 +4,7 @@ from pprint import pprint
 
 
 # Main script for the application
-tvst = tvshowtime.TvShowTime()
+tvst = tvshowtime.TvShowTime(credentials_secret.temp_token_showtime)
 
-parameters = {
-    'show_id': '153021'
-}
-
-# res = tvst.make_tvshowtime_request("show", parameters)
-# pprint(res)
-
-serie_id = tvst.test("The walking dead")
-print "Serie_id = " + serie_id
+response = tvst.get_last_aired_episode("The walking dead")
+pprint(response)

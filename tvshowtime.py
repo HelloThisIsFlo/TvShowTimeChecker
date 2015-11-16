@@ -10,6 +10,7 @@ def random_string_generator(size=6, chars=string.ascii_uppercase + string.digits
     return ''.join(random.choice(chars) for _ in range(size))
 
 
+# fixme make decorator compatible with multiple arguments
 def check_token_decorator(func):
     def inner(self):
         if not self.token:
@@ -106,7 +107,7 @@ class TvShowTime:
         print "Token = " + token
         print
 
-    @check_token_decorator
+    # fixme make decorator compatible with multiple arguments
     def make_tvshowtime_request(self, method, parameters):
         # Add token & encode parameters
         parameters['access_token'] = self.token
@@ -132,7 +133,24 @@ class TvShowTime:
 
         # Parse response
         response_tree = ElementTree.parse(response).getroot()
-        return response_tree.find('Series/seriesid').text  #serie_id
+        if response_tree.find('Series/seriesid') is not None:
+            return response_tree.find('Series/seriesid').text  #serie_id
+        else:
+            return None
+
+    def get_last_aired_episode(self, tv_show_name):
+        serie_id = self._get_tvdb_serie_id(tv_show_name)
+
+        if serie_id is not None:
+            parameters = {
+                'show_id': serie_id
+            }
+
+            response = self.make_tvshowtime_request("show", parameters)
+            last_aired = response['show']['last_aired']
+            return last_aired
+        else:
+            return None
 
     def test(self, test_arg):
         return self._get_tvdb_serie_id(test_arg)
