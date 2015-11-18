@@ -1,14 +1,13 @@
-import pprint
-import sys
+import json
+
 import httplib2
 from googleapiclient.discovery import build
 from oauth2client import tools
-from oauth2client.file import Storage
-from oauth2client.client import AccessTokenRefreshError
 from oauth2client.client import OAuth2WebServerFlow
+from oauth2client.file import Storage
+
 from credentials_secret import api_key, client_id, client_secret
-import dialog
-import json
+from ui import dialog
 
 
 def test_api_books():
