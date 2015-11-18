@@ -47,7 +47,7 @@ class TvShowTime:
         print("Please authenticate . . . . ")
         print("Call the method authenticate with 'client_id', 'client_secret' and 'user_agent'")
         print("The token will automatically be saved, no need to create a new instance!")
-        print
+        print()
 
     def generate_token(self, client_id, client_secret, user_agent):
         # Save the keys
@@ -63,8 +63,9 @@ class TvShowTime:
         f = urllib.request.Request(url)
         f.add_header('User-Agent', self.user_agent)
 
-        res = urllib.urlopen(f, data)  # Specifying the data argument transform makes a POST request instead of GET
-        return json.load(res)
+        res = urlopen(f, data)  # Specifying the data argument transform makes a POST request instead of GET
+        res_string = res.read().decode()
+        return json.load(res_string)
 
     def __make_step_1(self):
         step_1_url = "https://api.tvshowtime.com/v1/oauth/device/code?"
@@ -72,7 +73,7 @@ class TvShowTime:
 
         step_1_dict = self.__make_tvst_post(step_1_url, step_1_parameters)
 
-        # Print the authentification url and user code
+        # Print the authentication url and user code
         print("//////////////////////////")
         print("///   AUTHENTICATION   ///")
         print("//////////////////////////")
