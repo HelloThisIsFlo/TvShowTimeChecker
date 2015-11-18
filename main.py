@@ -44,7 +44,7 @@ def save_episode_progress(shows, guess):
     progress = compare_episode_progress(new_progress, current_progress)
 
     # Save progress
-    show_name = get_string_value('series', guess)
+    show_name = get_string_value('series', guess).title()
     if show_name is not "":
         shows[show_name] = progress
 
