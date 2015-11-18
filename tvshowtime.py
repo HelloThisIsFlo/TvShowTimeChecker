@@ -11,17 +11,7 @@ def random_string_generator(size=6, chars=string.ascii_uppercase + string.digits
     return ''.join(random.choice(chars) for _ in range(size))
 
 
-# fixme make decorator compatible with multiple arguments
-def check_token_decorator(func):
-    def inner(self):
-        if not self.token:
-            self.__prompt_authenticate()
-        else:
-            inner(self)
-
-    return inner
-
-
+# Add checks for authentication if token has expired (no even sure token can expire)
 class TvShowTime:
     """ This class is a utility class to connect to the TvShowTime API
 
@@ -39,15 +29,23 @@ class TvShowTime:
 
         self.device_code = ''
 
-        if not token:
-            self.__prompt_authenticate()
+        # if not token:
+        #     self.__prompt_authenticate()
 
-    @staticmethod
-    def __prompt_authenticate():
-        print("Please authenticate . . . . ")
-        print("Call the method authenticate with 'client_id', 'client_secret' and 'user_agent'")
-        print("The token will automatically be saved, no need to create a new instance!")
-        print()
+    def is_authenticated(self):
+        """
+        Check the authentication status
+
+        :return: True if authenticated, False otherwise
+        """
+        return self.token is not None
+
+    # @staticmethod
+    # def __prompt_authenticate():
+    #     print("Please authenticate . . . . ")
+    #     print("Call the method 'generate_token' with 'client_id', 'client_secret' and 'user_agent'")
+    #     print("The token will automatically be saved, no need to create a new instance!")
+    #     print()
 
     def generate_token(self, client_id, client_secret, user_agent):
         # Save the keys
@@ -58,14 +56,16 @@ class TvShowTime:
         # Make authentication
         self.__make_step_1()
         self.__make_step_2()
+        return self.token
 
     def __make_tvst_post(self, url, data):
         f = urllib.request.Request(url)
         f.add_header('User-Agent', self.user_agent)
 
-        res = urlopen(f, data)  # Specifying the data argument transform makes a POST request instead of GET
+        res = urlopen(f, data=data.encode('ASCII'))  # Specifying the data argument transform makes a POST request instead of GET
         res_string = res.read().decode()
-        return json.load(res_string)
+        return json.loads\
+            (res_string)
 
     def __make_step_1(self):
         step_1_url = "https://api.tvshowtime.com/v1/oauth/device/code?"
@@ -109,8 +109,15 @@ class TvShowTime:
         print("Token = " + token)
         print()
 
-    # fixme make decorator compatible with multiple arguments
     def make_tvshowtime_request(self, method, parameters):
+        # todo finish docstring
+        """
+        :param method:
+        :param parameters:
+        :return: (dict, boolean) : (result, auth_error)
+        """
+        if self.token is None:
+            return None, True
         # Add token & encode parameters
         parameters['access_token'] = self.token
         encoded_parameters = urlencode(parameters)
@@ -119,7 +126,7 @@ class TvShowTime:
         url = self.base_url + "/" + method + "?" + encoded_parameters
         res = urlopen(url)
         res_string = res.read().decode()
-        return json.loads(res_string)
+        return json.loads(res_string), False
 
     def _get_tvdb_serie_id(self, tv_show_name):
         # Create and encode parameters
@@ -149,11 +156,14 @@ class TvShowTime:
                 'show_id': serie_id
             }
 
-            response = self.make_tvshowtime_request("show", parameters)
-            last_aired = response['show']['last_aired']
-            return last_aired
+            response, auth_error = self.make_tvshowtime_request("show", parameters)
+            if auth_error:
+                return None, True
+            else:
+                last_aired = response['show']['last_aired']
+                return last_aired, False
         else:
-            return None
+            return None, False
 
     def test(self, test_arg):
         return self._get_tvdb_serie_id(test_arg)

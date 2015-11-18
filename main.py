@@ -83,6 +83,44 @@ def compare_episode_progress(new_progress, current_progress):
 
     return result_progress
 
+# TODO : Get path from command line argument
+# TODO : Pack the app in an exe, and check for the token 'saving place'
+# Print hello message
+print("////////////////////////////////")
+print("// WELCOME TO TV SHOW CHECKER //")
+print("////////////////////////////////")
+print()
+
+# Try to read token from file
+token = None
+try:
+    token_file = open("token.dat", "r")
+    token = token_file.read()
+    token_file.close()
+    print("Authentication : Token found! Skipping authentication")
+except FileNotFoundError:
+    print("Authentication : Token not found, prompting authentication")
+print()
+
+# Create the TvShowTime Object
+if token:
+    tvst = tvshowtime.TvShowTime(token)
+else:
+    tvst = tvshowtime.TvShowTime()
+
+# Check authentication
+if not tvst.is_authenticated():
+    # Get token
+    token = tvst.generate_token(
+        credentials_secret.client_id_showtime,
+        credentials_secret.client_secret_showtime,
+        credentials_secret.user_agent_showtime
+    )
+
+    # Save token
+    token_file = open("token.dat", "w")
+    token_file.write(token)
+    token_file.close()
 
 # Walk the 'Tv Show' directory
 test = os.walk(top=r'R:\Torrent\Tv Shows', topdown=False)
@@ -95,15 +133,13 @@ for _, _, files_current_dir in os.walk(r'R:\Torrent\Tv Shows'):
         # Save the infos in the dictionary
         save_episode_progress(shows, guess)
 
-# Create the TvShowTime Object
-tvst = tvshowtime.TvShowTime(credentials_secret.temp_token_showtime)
 
 print("////////////////////////")
 print("// LAST AIRED EPISODE //")
 print("////////////////////////")
 
 for tv_show_name, progress in shows.items():
-    last_aired = tvst.get_last_aired_episode(tv_show_name)
+    last_aired, _ = tvst.get_last_aired_episode(tv_show_name)
 
     progress_table = PrettyTable(["", "Season", "Episode"])
     progress_table.align[""] = "l"
