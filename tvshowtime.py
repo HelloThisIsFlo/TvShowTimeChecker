@@ -1,8 +1,9 @@
 import json
 import random
 import string
-import urllib2
-from urllib import urlencode
+import urllib.request
+from urllib.request import urlopen
+from urllib.parse import urlencode
 from xml.etree import ElementTree
 
 
@@ -59,10 +60,10 @@ class TvShowTime:
         self.__make_step_2()
 
     def __make_tvst_post(self, url, data):
-        f = urllib2.Request(url)
+        f = urllib.request.Request(url)
         f.add_header('User-Agent', self.user_agent)
 
-        res = urllib2.urlopen(f, data)  # Specifying the data argument transform makes a POST request instead of GET
+        res = urllib.urlopen(f, data)  # Specifying the data argument transform makes a POST request instead of GET
         return json.load(res)
 
     def __make_step_1(self):
@@ -72,13 +73,13 @@ class TvShowTime:
         step_1_dict = self.__make_tvst_post(step_1_url, step_1_parameters)
 
         # Print the authentification url and user code
-        print "//////////////////////////"
-        print "///   AUTHENTICATION   ///"
-        print "//////////////////////////"
-        print
-        print "Please go to this url : " + step_1_dict.get('verification_url', '')
-        print "And enter this code : " + step_1_dict.get('user_code', 'ERROR')
-        print
+        print("//////////////////////////")
+        print("///   AUTHENTICATION   ///")
+        print("//////////////////////////")
+        print()
+        print("Please go to this url : " + step_1_dict.get('verification_url', ''))
+        print("And enter this code : " + step_1_dict.get('user_code', 'ERROR'))
+        print()
         device_code = step_1_dict.get('device_code', '')
 
         if device_code is '':
@@ -86,7 +87,7 @@ class TvShowTime:
 
         # ok_dialog = dialog.Dialog()
         # ok_dialog.make_ok_dialog("Click 'Ok' when authenticated on TvShowTime")
-        raw_input("Press Enter to continue...")
+        input("Press Enter to continue...")
 
         self.device_code = device_code
 
@@ -104,8 +105,8 @@ class TvShowTime:
             raise Exception('No TOKEN . . . error somewhere! ^_^')
 
         self.token = token
-        print "Token = " + token
-        print
+        print("Token = " + token)
+        print()
 
     # fixme make decorator compatible with multiple arguments
     def make_tvshowtime_request(self, method, parameters):
@@ -115,8 +116,9 @@ class TvShowTime:
 
         # Make the url
         url = self.base_url + "/" + method + "?" + encoded_parameters
-        res = urllib2.urlopen(url)
-        return json.load(res)
+        res = urlopen(url)
+        res_string = res.read().decode()
+        return json.loads(res_string)
 
     def _get_tvdb_serie_id(self, tv_show_name):
         # Create and encode parameters
@@ -129,7 +131,7 @@ class TvShowTime:
         url = self.base_url_tvdb + "?" + encoded_parameters
 
         # Make request
-        response = urllib2.urlopen(url)
+        response = urllib.request.urlopen(url)
 
         # Parse response
         response_tree = ElementTree.parse(response).getroot()

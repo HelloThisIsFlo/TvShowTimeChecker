@@ -12,10 +12,11 @@ from ui import dialog
 
 def test_api_books():
     # Get the search text
-    dialog_box = dialog.Dialog("Search book : ")
+    dialog_box = dialog.Dialog()
+    dialog_box.make_input_dialog("Search book : ")
     search_text = dialog_box.result
 
-    print "Searched text via dialog : {text}".format(text=search_text)
+    print("Searched text via dialog : {text}".format(text=search_text))
 
     # Returns and instance of an API service object that can be used to make API calls
     service = build("books", "v1", developerKey=api_key)
@@ -27,14 +28,14 @@ def test_api_books():
 
 
     # Print the number of books retrieved
-    print "Found {length} books!".format(length=len(response['items']))
+    print("Found {length} books!".format(length=len(response['items'])))
 
     for book in response.get('items', []):  # Return an empty list if no items, so it's still "iterable"
         volume_info = book.get('volumeInfo', [])
 
-        print "/////////////////////////////////"
+        print("/////////////////////////////////")
         try:
-            print unicode("The book '{title}' has the following authors : ".format(title=volume_info['title']))
+            print("The book '{title}' has the following authors : ".format(title=volume_info['title']))
         except UnicodeEncodeError:
             pass
 
@@ -42,13 +43,13 @@ def test_api_books():
         for author in volume_info.get('authors', []):
             i += 1
             try:
-                print unicode("Author {i} : {author}".format(i=i, author=author))
+                print("Author {i} : {author}".format(i=i, author=author))
             except UnicodeEncodeError:
                 pass
 
-        print "/////////////////////////////////"
-        print
-        print
+        print("/////////////////////////////////")
+        print()
+        print()
 
 
 def get_credentials(scope_url):
@@ -103,14 +104,16 @@ base_url = "https://www.googleapis.com/drive/v2"
 # print content
 
 # Transform the content string into a dictionary
-content_dict = json.loads(content)
+content_dict = json.loads(content.decode())
 
 
 for item in content_dict.get('items', []):
-    print item['title']
+    print(item['title'])
 
 
-print "END"
+print("END")
+
+test_api_books()
 
 
 

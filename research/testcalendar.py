@@ -87,7 +87,7 @@ def main():
       # returns a list of item objects (events).
       for event in response.get('items', []):
         # The event object is a dict object with a 'summary' key.
-        print repr(event.get('summary', 'NO SUMMARY')) + '\n'
+        print(repr(event.get('summary', 'NO SUMMARY')) + '\n')
       # Get the next request object by passing the previous request object to
       # the list_next method.
       request = service.events().list_next(request, response)

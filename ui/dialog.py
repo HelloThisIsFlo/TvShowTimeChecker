@@ -1,4 +1,4 @@
-from Tkinter import Tk, Label, Entry, Button
+from tkinter import Tk, Label, Entry, Button
 
 
 # Decorator to create a new instance of TK every time

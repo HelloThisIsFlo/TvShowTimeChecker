@@ -7,11 +7,11 @@ import tvshowtime
 
 
 def display_file_infos(guess):
-    print "//////////////////////////////////////////////////////////////////////////////"
-    print "Name : " + get_string_value('series', guess)
-    print "Season : " + get_string_value('season', guess)
-    print "Episode : " + get_string_value('episode', guess)
-    print "//////////////////////////////////////////////////////////////////////////////"
+    print("//////////////////////////////////////////////////////////////////////////////")
+    print("Name : " + get_string_value('series', guess))
+    print("Season : " + get_string_value('season', guess))
+    print("Episode : " + get_string_value('episode', guess))
+    print("//////////////////////////////////////////////////////////////////////////////")
     print
 
 
@@ -98,11 +98,11 @@ for _, _, files_current_dir in os.walk(r'R:\Torrent\Tv Shows'):
 # Create the TvShowTime Object
 tvst = tvshowtime.TvShowTime(credentials_secret.temp_token_showtime)
 
-print "////////////////////////"
-print "// LAST AIRED EPISODE //"
-print "////////////////////////"
+print("////////////////////////")
+print("// LAST AIRED EPISODE //")
+print("////////////////////////")
 
-for tv_show_name, progress in shows.iteritems():
+for tv_show_name, progress in shows.items():
     last_aired = tvst.get_last_aired_episode(tv_show_name)
 
     progress_table = PrettyTable(["", "Season", "Episode"])
@@ -110,6 +110,6 @@ for tv_show_name, progress in shows.iteritems():
     progress_table.add_row(["Dowloaded", progress['season'], progress['episode']])
     progress_table.add_row(["Last aired", last_aired['season_number'], last_aired['number']])
 
-    print
-    print " " + tv_show_name
-    print progress_table
+    print()
+    print(" " + tv_show_name)
+    print(progress_table)
