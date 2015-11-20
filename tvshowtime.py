@@ -148,7 +148,7 @@ class TvShowTime:
         else:
             return None
 
-    def get_last_aired_episode(self, tv_show_name):
+    def get_show_infos(self, tv_show_name):
         serie_id = self._get_tvdb_serie_id(tv_show_name)
 
         if serie_id is not None:
@@ -160,8 +160,8 @@ class TvShowTime:
             if auth_error:
                 return None, True
             else:
-                last_aired = response['show']['last_aired']
-                return last_aired, False
+                show_info = response['show']
+                return show_info, False
         else:
             return None, False
 

@@ -139,12 +139,19 @@ print("// LAST AIRED EPISODE //")
 print("////////////////////////")
 
 for tv_show_name, progress in shows.items():
-    last_aired, _ = tvst.get_last_aired_episode(tv_show_name)
+    show_infos, _ = tvst.get_show_infos(tv_show_name)
 
     progress_table = PrettyTable(["", "Season", "Episode"])
     progress_table.align[""] = "l"
-    progress_table.add_row(["Dowloaded", progress['season'], progress['episode']])
-    progress_table.add_row(["Last aired", last_aired['season_number'], last_aired['number']])
+    progress_table.add_row(
+        ["Last aired", show_infos['last_aired']['season_number'], show_infos['last_aired']['number']]
+    )
+    progress_table.add_row(["Downloaded", progress['season'], progress['episode']])
+    last_seen = show_infos['last_seen']
+    if last_seen is not None:
+        progress_table.add_row(
+            ["Last seen", last_seen['season_number'], last_seen['number']]
+        )
 
     print()
     print(" " + tv_show_name)
