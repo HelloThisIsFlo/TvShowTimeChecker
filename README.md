@@ -17,3 +17,6 @@ Create Tv Showtime API keys and add them to a new module called "credentials_sec
  * client_id_showtime,
  * client_secret_showtime,
  * user_agent_showtime
+
+## Build
+I will later add a Google drive link to a complete working executable build based on Python 3.5
