@@ -2,6 +2,7 @@ import json
 import random
 import string
 import urllib.request
+import webbrowser
 from urllib.request import urlopen
 from urllib.parse import urlencode
 from xml.etree import ElementTree
@@ -78,9 +79,12 @@ class TvShowTime:
         print("///   AUTHENTICATION   ///")
         print("//////////////////////////")
         print()
-        print("Please go to this url : " + step_1_dict.get('verification_url', ''))
+        print("You will be redirected to this url : " + step_1_dict.get('verification_url', ''))
         print("And enter this code : " + step_1_dict.get('user_code', 'ERROR'))
         print()
+        input("Press ENTER to open the web browser . . .")
+
+        webbrowser.open(step_1_dict.get('verification_url', ''))
         device_code = step_1_dict.get('device_code', '')
 
         if device_code is '':

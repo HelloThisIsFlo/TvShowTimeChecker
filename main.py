@@ -1,6 +1,8 @@
 import os
 import guessit
 from prettytable import PrettyTable
+from tkinter import Tk
+from tkinter.filedialog import askdirectory
 
 import credentials_secret
 import tvshowtime
@@ -83,8 +85,8 @@ def compare_episode_progress(new_progress, current_progress):
 
     return result_progress
 
-# TODO : Get path from command line argument
-# TODO : Pack the app in an exe, and check for the token 'saving place'
+# TODO Encrypt files before compiling to exe (.pyc)
+
 # Print hello message
 print("////////////////////////////////")
 print("// WELCOME TO TV SHOW CHECKER //")
@@ -122,10 +124,16 @@ if not tvst.is_authenticated():
     token_file.write(token)
     token_file.close()
 
+# Prompt the user to choose the tv shows directory
+print("You will now be prompted to select the Tv Shows directory")
+input("Press ENTER . . .")
+Tk().withdraw()  # we don't want a full GUI, so keep the root window from appearing
+directory = askdirectory()  # show an "Open" dialog box and return the path to the selected file
+
 # Walk the 'Tv Show' directory
-test = os.walk(top=r'R:\Torrent\Tv Shows', topdown=False)
 shows = dict()
-for _, _, files_current_dir in os.walk(r'R:\Torrent\Tv Shows'):
+# for _, _, files_current_dir in os.walk(r'R:\Torrent\Tv Shows'):
+for _, _, files_current_dir in os.walk(directory):
     for file in files_current_dir:
         # Guess the file infos
         guess = guessit.guess_episode_info(file)
@@ -156,3 +164,10 @@ for tv_show_name, progress in shows.items():
     print()
     print(" " + tv_show_name)
     print(progress_table)
+
+print()
+print()
+print("/////////////////////////")
+print("// PRESS ENTER TO QUIT //")
+print("/////////////////////////")
+input()
