@@ -11,3 +11,9 @@ For the app to work, the files need to have the standard file naming convention.
 It uses the libraries :
  * Guessit
  * Prettytable
+
+## Use
+Create Tv Showtime API keys and add them to a new module called "credentials_secret" under the names : 
+ * client_id_showtime,
+ * client_secret_showtime,
+ * user_agent_showtime
