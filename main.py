@@ -14,7 +14,7 @@ def display_file_infos(guess):
     print("Season : " + get_string_value('season', guess))
     print("Episode : " + get_string_value('episode', guess))
     print("//////////////////////////////////////////////////////////////////////////////")
-    print
+    print()
 
 
 def get_string_value(key, dictionary):
@@ -149,21 +149,24 @@ print("////////////////////////")
 for tv_show_name, progress in shows.items():
     show_infos, _ = tvst.get_show_infos(tv_show_name)
 
-    progress_table = PrettyTable(["", "Season", "Episode"])
-    progress_table.align[""] = "l"
-    progress_table.add_row(
-        ["Last aired", show_infos['last_aired']['season_number'], show_infos['last_aired']['number']]
-    )
-    progress_table.add_row(["Downloaded", progress['season'], progress['episode']])
-    last_seen = show_infos['last_seen']
-    if last_seen is not None:
-        progress_table.add_row(
-            ["Last seen", last_seen['season_number'], last_seen['number']]
-        )
+    if show_infos is not None:
+        progress_table = PrettyTable(["", "Season", "Episode"])
+        progress_table.align[""] = "l"
+        last_aired = show_infos['last_aired']
+        if last_aired is not None:
+            progress_table.add_row(
+                ["Last aired", show_infos['last_aired']['season_number'], show_infos['last_aired']['number']]
+            )
+        progress_table.add_row(["Downloaded", progress['season'], progress['episode']])
+        last_seen = show_infos['last_seen']
+        if last_seen is not None:
+            progress_table.add_row(
+                ["Last seen", last_seen['season_number'], last_seen['number']]
+            )
 
-    print()
-    print(" " + tv_show_name)
-    print(progress_table)
+        print()
+        print(" " + tv_show_name)
+        print(progress_table)
 
 print()
 print()
